@@ -3,56 +3,357 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Video Player</title>
-
+<title>Loading...</title>
 <style>
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f0f1a;
+    color: #fff;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #111;
-    font-family: Arial, sans-serif;
-}
+    flex-direction: column;
+    overflow-x: hidden;
+  }
 
-.video-container {
-    width: 90%;
-    max-width: 800px;
-}
+  /* ========== LOADING ========== */
+  #loadingScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .spinner {
+    width: 70px;
+    height: 70px;
+    border: 6px solid rgba(255,255,255,0.1);
+    border-top-color: #00d4ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-video {
+  .text { font-size: 18px; letter-spacing: 2px; opacity: 0.8; }
+
+  .bar {
+    width: 220px; height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px; overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+    animation: fill 2s ease forwards;
+  }
+  @keyframes fill { to { width: 100%; } }
+
+  /* ========== MENU ========== */
+  #menuScreen { display: none; animation: fadeIn 0.6s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .kotak {
+    width: 300px;
+    padding: 24px;
+    border: 2px solid #00d4ff;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.03);
+    box-shadow: 0 0 25px rgba(0,212,255,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .kotak h1 {
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: #00d4ff;
+    text-shadow: 0 0 10px rgba(0,212,255,0.7);
+    border-bottom: 1px solid rgba(0,212,255,0.3);
+    padding-bottom: 12px;
     width: 100%;
-    display: block;
+    text-align: center;
+  }
+
+  .game-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .game-btn {
+    padding: 14px;
+    background: transparent;
+    border: 2px solid #7b2ff7;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+  }
+  .game-btn:hover {
+    background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+    transform: scale(1.03);
+    box-shadow: 0 0 15px rgba(0,212,255,0.5);
+  }
+
+  /* ========== PLAYER ========== */
+  #playerScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .video-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 90vw;
+  }
+
+  video {
+    max-width: 90vw;
+    max-height: 70vh;
     border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0,212,255,0.4);
     background: #000;
-}
+    display: block;
+  }
+
+  .overlay-text {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 
+      0 0 10px #000,
+      0 0 20px #00d4ff,
+      2px 2px 0 #000,
+      -2px -2px 0 #000,
+      2px -2px 0 #000,
+      -2px 2px 0 #000;
+    text-align: center;
+    pointer-events: none;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 10px;
+    animation: glow 2s ease-in-out infinite alternate;
+    z-index: 10;
+    display: none;
+  }
+
+  @keyframes glow {
+    from { text-shadow: 0 0 10px #000, 0 0 20px #00d4ff, 2px 2px 0 #000, -2px -2px 0 #000; }
+    to   { text-shadow: 0 0 20px #000, 0 0 40px #7b2ff7, 2px 2px 0 #000, -2px -2px 0 #000; }
+  }
+
+  .back-btn {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .back-btn:hover { transform: scale(1.05); }
+
+  /* ========== EMOJI RAIN ========== */
+  .emoji-rain {
+    position: fixed;
+    top: -80px;
+    font-size: 40px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: fall linear forwards;
+    user-select: none;
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh) rotate(360deg);
+      opacity: 0.3;
+    }
+  }
 </style>
 </head>
-
 <body>
 
-<div class="video-container">
+  <!-- ===== LOADING ===== -->
+  <div id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="bar"><div class="bar-fill"></div></div>
+    <div class="text">LOADING...</div>
+  </div>
 
-    <video
-        id="video"
-        controls
-        playsinline
-        preload="metadata">
+  <!-- ===== MENU ===== -->
+  <div id="menuScreen">
+    <div class="kotak">
+      <h1>GAME</h1>
+      <div class="game-list" id="gameList"></div>
+    </div>
+  </div>
 
-        <source
-            src="https://www.image2url.com/r2/default/videos/1791126757233-35ff92a1-f720-492c-a119-852f86854f47.mp4"
-            type="video/mp4">
+  <!-- ===== PLAYER ===== -->
+  <div id="playerScreen">
+    <div class="video-wrapper">
+      <video id="myVideo" controls></video>
+      <div class="overlay-text" id="overlayText"></div>
+    </div>
+    <button class="back-btn" onclick="balikMenu()">← Kembali</button>
+  </div>
 
-        Browser kamu tidak mendukung pemutar video.
-    </video>
+  <script>
+    /* ==========================================================
+       ISI DAFTAR GAME DI SINI BRO 👇
+       
+       - nama          : judul tombol
+       - url           : link video
+       - pesan         : tulisan di atas video
+       - emojiRain     : emoji yang jatuh
+       - rainDelay     : (ms) jeda sebelum emoji mulai jatuh
+       - rainDuration  : (ms) berapa lama emoji terus turun
+       - rainInterval  : (ms) jeda antar emoji (makin kecil makin rame)
+    ========================================================== */
+    const DAFTAR_GAME = [
+      { 
+        nama: "Game Superman",  
+        url: "https://www.image2url.com/r2/default/files/1791149463820-3d8c6c6a-2e83-4c93-aaaa-1e3006bdeda2.mp4"
+      },
+      { 
+        nama: "Game Kuicng",  
+        url: "https://www.image2url.com/r2/default/files/1791148691769-8264839a-d843-44a3-9615-86a33ff51e8b.mp4",
+        pesan: "ente yakin itu kucing?",
+        emojiRain: "🤨",
+        rainDelay: 3000,       // ⏰ mulai setelah 1 detik
+        rainDuration: 2000,    // ⏰ hujan selama 5 detik
+        rainInterval: 1000       // ⏰ jeda antar emoji (80ms)
+      },
+    ];
 
-</div>
+    const DURASI_LOADING = 2000;
 
+    /* Loading → menu */
+    setTimeout(() => {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('menuScreen').style.display = 'block';
+      bikinMenu();
+    }, DURASI_LOADING);
+
+    /* Bikin tombol game */
+    function bikinMenu() {
+      const list = document.getElementById('gameList');
+      list.innerHTML = '';
+
+      DAFTAR_GAME.forEach(game => {
+        const btn = document.createElement('button');
+        btn.className = 'game-btn';
+        btn.textContent = game.nama;
+        btn.onclick = () => bukaGame(game);
+        list.appendChild(btn);
+      });
+    }
+
+    /* Klik game */
+    function bukaGame(game) {
+      if (!game.url || game.url.trim() === "") {
+        alert("⚠️ Video \"" + game.nama + "\" belum diisi bro!");
+        return;
+      }
+
+      document.getElementById('menuScreen').style.display = 'none';
+      document.getElementById('playerScreen').style.display = 'flex';
+
+      const player = document.getElementById('myVideo');
+      const overlay = document.getElementById('overlayText');
+
+      player.src = game.url;
+      player.play();
+
+      // Pesan di atas video
+      if (game.pesan && game.pesan.trim() !== "") {
+        overlay.textContent = game.pesan;
+        overlay.style.display = 'block';
+      } else {
+        overlay.style.display = 'none';
+      }
+
+      // 🔥 Emoji rain dengan timing
+      if (game.emojiRain && game.emojiRain.trim() !== "") {
+        const delay    = game.rainDelay    ?? 0;
+        const duration = game.rainDuration ?? 5000;
+        const interval = game.rainInterval ?? 80;
+
+        setTimeout(() => {
+          hujanEmoji(game.emojiRain, duration, interval);
+        }, delay);
+      }
+    }
+
+    /* Fungsi hujan emoji dengan durasi */
+    function hujanEmoji(emoji, duration, interval) {
+      const emojiArr = [...emoji];
+      const startTime = Date.now();
+
+      const timer = setInterval(() => {
+        // Cek udah lewat durasi belum
+        if (Date.now() - startTime >= duration) {
+          clearInterval(timer);
+          return;
+        }
+
+        // Bikin 1 emoji
+        const el = document.createElement('div');
+        el.className = 'emoji-rain';
+        el.textContent = emojiArr[Math.floor(Math.random() * emojiArr.length)];
+
+        el.style.left = Math.random() * 100 + 'vw';
+
+        const size = 25 + Math.random() * 35;
+        el.style.fontSize = size + 'px';
+
+        const fallDurasi = 2.5 + Math.random() * 2.5;
+        el.style.animationDuration = fallDurasi + 's';
+
+        document.body.appendChild(el);
+
+        setTimeout(() => el.remove(), fallDurasi * 1000 + 500);
+      }, interval);
+    }
+
+    /* Balik ke menu */
+    function balikMenu() {
+      const player = document.getElementById('myVideo');
+      player.pause();
+      player.src = "";
+
+      document.getElementById('overlayText').style.display = 'none';
+      document.querySelectorAll('.emoji-rain').forEach(el => el.remove());
+
+      document.getElementById('playerScreen').style.display = 'none';
+      document.getElementById('menuScreen').style.display = 'block';
+    }
+  </script>
 </body>
 </html>
