@@ -116,6 +116,7 @@
     animation: fadeIn 0.5s ease;
     position: relative;
     z-index: 1;
+    width: 100%;
   }
 
   .video-wrapper {
@@ -131,6 +132,18 @@
     box-shadow: 0 0 30px rgba(0,212,255,0.4);
     background: #000;
     display: block;
+  }
+
+  /* GAME (IFRAME) */
+  #gameFrame {
+    width: 90vw;
+    height: 70vh;
+    max-width: 900px;
+    border: 2px solid #00d4ff;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0,212,255,0.4);
+    background: #000;
+    display: none;
   }
 
   .overlay-text {
@@ -221,6 +234,7 @@
       <video id="myVideo" controls></video>
       <div class="overlay-text" id="overlayText"></div>
     </div>
+    <iframe id="gameFrame" allowfullscreen></iframe>
     <button class="back-btn" onclick="balikMenu()">← Kembali</button>
   </div>
 
@@ -228,27 +242,38 @@
     /* ==========================================================
        ISI DAFTAR GAME DI SINI BRO 👇
        
-       - nama          : judul tombol
-       - url           : link video
+       - nama : judul tombol
+       - tipe : "video"  = putar video mp4
+                "game"   = buka game di iframe
+       - url  : link video atau link game
+       
+       -- OPSIONAL (khusus video) --
        - pesan         : tulisan di atas video
        - emojiRain     : emoji yang jatuh
        - rainDelay     : (ms) jeda sebelum emoji mulai jatuh
        - rainDuration  : (ms) berapa lama emoji terus turun
-       - rainInterval  : (ms) jeda antar emoji (makin kecil makin rame)
+       - rainInterval  : (ms) jeda antar emoji
     ========================================================== */
     const DAFTAR_GAME = [
       { 
-        nama: "Game Superman",  
+        nama: "Game Superman",
+        tipe: "video",
         url: "https://www.image2url.com/r2/default/files/1791149463820-3d8c6c6a-2e83-4c93-aaaa-1e3006bdeda2.mp4"
       },
       { 
-        nama: "Game Kuicng",  
+        nama: "Game Kucing",  
+        tipe: "video",
         url: "https://www.image2url.com/r2/default/files/1791148691769-8264839a-d843-44a3-9615-86a33ff51e8b.mp4",
         pesan: "ente yakin itu kucing?",
         emojiRain: "🤨",
-        rainDelay: 3000,       // ⏰ mulai setelah 1 detik
-        rainDuration: 2000,    // ⏰ hujan selama 5 detik
-        rainInterval: 1000       // ⏰ jeda antar emoji (80ms)
+        rainDelay: 3000,
+        rainDuration: 2000,
+        rainInterval: 1000
+      },
+      { 
+        nama: "Kucing?",              // <-- 🆕 GAME BARU
+        tipe: "game",                  // <-- tipe game (bukan video)
+        url: "https://www.image2url.com/r2/default/videos/1791159675824-64a9633e-7bf3-4302-8af6-aa79514dfbe5.mp4"                        // <-- isi link game-nya nanti
       },
     ];
 
@@ -275,55 +300,70 @@
       });
     }
 
-    /* Klik game */
+    /* Klik item */
     function bukaGame(game) {
       if (!game.url || game.url.trim() === "") {
-        alert("⚠️ Video \"" + game.nama + "\" belum diisi bro!");
+        alert("⚠️ Link \"" + game.nama + "\" belum diisi bro!");
         return;
       }
 
       document.getElementById('menuScreen').style.display = 'none';
       document.getElementById('playerScreen').style.display = 'flex';
 
-      const player = document.getElementById('myVideo');
+      const player  = document.getElementById('myVideo');
       const overlay = document.getElementById('overlayText');
+      const iframe  = document.getElementById('gameFrame');
 
-      player.src = game.url;
-      player.play();
+      // Reset dulu semua
+      player.pause();
+      player.src = "";
+      player.style.display = 'none';
+      iframe.src = "";
+      iframe.style.display = 'none';
+      overlay.style.display = 'none';
 
-      // Pesan di atas video
-      if (game.pesan && game.pesan.trim() !== "") {
-        overlay.textContent = game.pesan;
-        overlay.style.display = 'block';
-      } else {
-        overlay.style.display = 'none';
+      /* ===== KALAU VIDEO ===== */
+      if (game.tipe === "video") {
+        player.style.display = 'block';
+        player.src = game.url;
+        player.play();
+
+        // Pesan
+        if (game.pesan && game.pesan.trim() !== "") {
+          overlay.textContent = game.pesan;
+          overlay.style.display = 'block';
+        }
+
+        // Emoji rain
+        if (game.emojiRain && game.emojiRain.trim() !== "") {
+          const delay    = game.rainDelay    ?? 0;
+          const duration = game.rainDuration ?? 5000;
+          const interval = game.rainInterval ?? 80;
+
+          setTimeout(() => {
+            hujanEmoji(game.emojiRain, duration, interval);
+          }, delay);
+        }
       }
 
-      // 🔥 Emoji rain dengan timing
-      if (game.emojiRain && game.emojiRain.trim() !== "") {
-        const delay    = game.rainDelay    ?? 0;
-        const duration = game.rainDuration ?? 5000;
-        const interval = game.rainInterval ?? 80;
-
-        setTimeout(() => {
-          hujanEmoji(game.emojiRain, duration, interval);
-        }, delay);
+      /* ===== KALAU GAME ===== */
+      else if (game.tipe === "game") {
+        iframe.style.display = 'block';
+        iframe.src = game.url;
       }
     }
 
-    /* Fungsi hujan emoji dengan durasi */
+    /* Fungsi hujan emoji */
     function hujanEmoji(emoji, duration, interval) {
       const emojiArr = [...emoji];
       const startTime = Date.now();
 
       const timer = setInterval(() => {
-        // Cek udah lewat durasi belum
         if (Date.now() - startTime >= duration) {
           clearInterval(timer);
           return;
         }
 
-        // Bikin 1 emoji
         const el = document.createElement('div');
         el.className = 'emoji-rain';
         el.textContent = emojiArr[Math.floor(Math.random() * emojiArr.length)];
@@ -345,8 +385,12 @@
     /* Balik ke menu */
     function balikMenu() {
       const player = document.getElementById('myVideo');
+      const iframe = document.getElementById('gameFrame');
+
       player.pause();
       player.src = "";
+      iframe.src = "";
+      iframe.style.display = 'none';
 
       document.getElementById('overlayText').style.display = 'none';
       document.querySelectorAll('.emoji-rain').forEach(el => el.remove());
