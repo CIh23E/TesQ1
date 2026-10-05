@@ -176,6 +176,33 @@
     to   { text-shadow: 0 0 20px #000, 0 0 40px #7b2ff7, 2px 2px 0 #000, -2px -2px 0 #000; }
   }
 
+  /* ========== TOMBOL DOWNLOAD (BARU) ========== */
+  .download-btn {
+    display: none;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #00ff88, #00d4ff);
+    color: #0f0f1a;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    box-shadow: 0 0 20px rgba(0,255,136,0.4);
+    transition: 0.3s;
+    text-decoration: none;
+    text-align: center;
+    animation: pulse 2s infinite;
+  }
+  .download-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0,255,136,0.8);
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(0,255,136,0.4); }
+    50%      { box-shadow: 0 0 35px rgba(0,255,136,0.8); }
+  }
+
   .back-btn {
     padding: 10px 24px;
     background: linear-gradient(135deg, #00d4ff, #7b2ff7);
@@ -235,6 +262,12 @@
       <div class="overlay-text" id="overlayText"></div>
     </div>
     <iframe id="gameFrame" allowfullscreen></iframe>
+
+    <!-- ⬇️ TOMBOL DOWNLOAD GAME -->
+    <a id="downloadBtn" class="download-btn" href="#" target="_blank" rel="noopener">
+      ⬇️ Download Game
+    </a>
+
     <button class="back-btn" onclick="balikMenu()">← Kembali</button>
   </div>
 
@@ -242,17 +275,11 @@
     /* ==========================================================
        ISI DAFTAR GAME DI SINI BRO 👇
        
-       - nama : judul tombol
-       - tipe : "video"  = putar video mp4
-                "game"   = buka game di iframe
-       - url  : link video atau link game
-       
-       -- OPSIONAL (khusus video) --
-       - pesan         : tulisan di atas video
-       - emojiRain     : emoji yang jatuh
-       - rainDelay     : (ms) jeda sebelum emoji mulai jatuh
-       - rainDuration  : (ms) berapa lama emoji terus turun
-       - rainInterval  : (ms) jeda antar emoji
+       - nama        : judul tombol
+       - tipe        : "video" / "game"
+       - url         : link video atau link game
+       - downloadUrl : (OPSIONAL) link download game
+                       → tombol "Download Game" muncul
     ========================================================== */
     const DAFTAR_GAME = [
       { 
@@ -273,12 +300,13 @@
       { 
         nama: "Kucing?",
         tipe: "game",
-        url: "https://www.image2url.com/r2/default/videos/1791159675824-64a9633e-7bf3-4302-8af6-aa79514dfbe5.mp4"                        // <-- isi link game-nya nanti
+        url: "https://www.image2url.com/r2/default/videos/1791159675824-64a9633e-7bf3-4302-8af6-aa79514dfbe5.mp4"
       },
       { 
-        nama: "Game POV Cat",         // <-- 🆕 VIDEO BARU
+        nama: "Game POV Cat",
         tipe: "video",
-        url: "https://www.image2url.com/r2/default/videos/1791161405454-e4839185-0a2d-4a75-943d-0e2cc28f3526.mp4"                        // <-- isi link videonya nanti
+        url: "https://www.image2url.com/r2/default/videos/1791161405454-e4839185-0a2d-4a75-943d-0e2cc28f3526.mp4",
+        downloadUrl: "https://download2443.mediafire.com/7ppyaxnepbvgM5wNnpd9JAfnOJZZhcp_3SSJ0eDD_bVjwlpotH_Ccfow45spgV16bgNEeewk7Y55YzRbfCpFKqwaRBk8xbEeDEzf9I8_nKJP-g9qishqIcS2zqZ4u2AEmSLq2DoJ1d8__1cnh2JNc6I7Pvm-n-u9904qbTKP3Vo/8lbqxxk15pux052/FNATBS.apk"
       },
     ];
 
@@ -318,6 +346,7 @@
       const player  = document.getElementById('myVideo');
       const overlay = document.getElementById('overlayText');
       const iframe  = document.getElementById('gameFrame');
+      const dlBtn   = document.getElementById('downloadBtn');
 
       // Reset dulu semua
       player.pause();
@@ -326,6 +355,7 @@
       iframe.src = "";
       iframe.style.display = 'none';
       overlay.style.display = 'none';
+      dlBtn.style.display = 'none';
 
       /* ===== KALAU VIDEO ===== */
       if (game.tipe === "video") {
@@ -349,12 +379,24 @@
             hujanEmoji(game.emojiRain, duration, interval);
           }, delay);
         }
+
+        // 🔥 Tombol download untuk VIDEO juga
+        if (game.downloadUrl && game.downloadUrl.trim() !== "") {
+          dlBtn.href = game.downloadUrl;
+          dlBtn.style.display = 'inline-block';
+        }
       }
 
       /* ===== KALAU GAME ===== */
       else if (game.tipe === "game") {
         iframe.style.display = 'block';
         iframe.src = game.url;
+
+        // Tombol download untuk GAME
+        if (game.downloadUrl && game.downloadUrl.trim() !== "") {
+          dlBtn.href = game.downloadUrl;
+          dlBtn.style.display = 'inline-block';
+        }
       }
     }
 
@@ -398,6 +440,7 @@
       iframe.style.display = 'none';
 
       document.getElementById('overlayText').style.display = 'none';
+      document.getElementById('downloadBtn').style.display = 'none';
       document.querySelectorAll('.emoji-rain').forEach(el => el.remove());
 
       document.getElementById('playerScreen').style.display = 'none';
