@@ -176,7 +176,7 @@
     to   { text-shadow: 0 0 20px #000, 0 0 40px #7b2ff7, 2px 2px 0 #000, -2px -2px 0 #000; }
   }
 
-  /* ========== TOMBOL DOWNLOAD (BARU) ========== */
+  /* ========== TOMBOL DOWNLOAD ========== */
   .download-btn {
     display: none;
     padding: 14px 32px;
@@ -276,10 +276,10 @@
        ISI DAFTAR GAME DI SINI BRO 👇
        
        - nama        : judul tombol
-       - tipe        : "video" / "game"
-       - url         : link video atau link game
+       - tipe        : "video" / "game" / "download"
+                       "download" = cuma munculin tombol download
+       - url         : link video atau link game (boleh kosong kalau tipe "download")
        - downloadUrl : (OPSIONAL) link download game
-                       → tombol "Download Game" muncul
     ========================================================== */
     const DAFTAR_GAME = [
       { 
@@ -306,7 +306,13 @@
         nama: "Game POV Cat",
         tipe: "video",
         url: "https://www.image2url.com/r2/default/videos/1791161405454-e4839185-0a2d-4a75-943d-0e2cc28f3526.mp4",
-        downloadUrl: "https://download2443.mediafire.com/7ppyaxnepbvgM5wNnpd9JAfnOJZZhcp_3SSJ0eDD_bVjwlpotH_Ccfow45spgV16bgNEeewk7Y55YzRbfCpFKqwaRBk8xbEeDEzf9I8_nKJP-g9qishqIcS2zqZ4u2AEmSLq2DoJ1d8__1cnh2JNc6I7Pvm-n-u9904qbTKP3Vo/8lbqxxk15pux052/FNATBS.apk"
+        downloadUrl: "https://www.mediafire.com/file/8lbqxxk15pux052/FNATBS.apk/file?dkey=r0qqhhxdlol&r=1660"
+      },
+      { 
+        nama: "Game Rpg🤨",     // <-- 🆕 GAME BARU (cuma download)
+        tipe: "download",       // <-- tipe khusus: cuma tombol download
+        url: "",                // <-- ga perlu link video/game
+        downloadUrl: "https://www.mediafire.com/file/9ct6j5tjokkvf40/RPS.apk/file?dkey=19l2fuc56j8&r=400"         // <-- isi link download nanti
       },
     ];
 
@@ -335,8 +341,15 @@
 
     /* Klik item */
     function bukaGame(game) {
-      if (!game.url || game.url.trim() === "") {
+      // Cek dulu: kalau bukan tipe "download", url wajib diisi
+      if (game.tipe !== "download" && (!game.url || game.url.trim() === "")) {
         alert("⚠️ Link \"" + game.nama + "\" belum diisi bro!");
+        return;
+      }
+
+      // Kalau tipe "download", downloadUrl wajib diisi
+      if (game.tipe === "download" && (!game.downloadUrl || game.downloadUrl.trim() === "")) {
+        alert("⚠️ Link download \"" + game.nama + "\" belum diisi bro!");
         return;
       }
 
@@ -363,13 +376,11 @@
         player.src = game.url;
         player.play();
 
-        // Pesan
         if (game.pesan && game.pesan.trim() !== "") {
           overlay.textContent = game.pesan;
           overlay.style.display = 'block';
         }
 
-        // Emoji rain
         if (game.emojiRain && game.emojiRain.trim() !== "") {
           const delay    = game.rainDelay    ?? 0;
           const duration = game.rainDuration ?? 5000;
@@ -380,7 +391,6 @@
           }, delay);
         }
 
-        // 🔥 Tombol download untuk VIDEO juga
         if (game.downloadUrl && game.downloadUrl.trim() !== "") {
           dlBtn.href = game.downloadUrl;
           dlBtn.style.display = 'inline-block';
@@ -392,11 +402,17 @@
         iframe.style.display = 'block';
         iframe.src = game.url;
 
-        // Tombol download untuk GAME
         if (game.downloadUrl && game.downloadUrl.trim() !== "") {
           dlBtn.href = game.downloadUrl;
           dlBtn.style.display = 'inline-block';
         }
+      }
+
+      /* ===== KALAU CUMA DOWNLOAD ===== */
+      else if (game.tipe === "download") {
+        // Langsung tampilkan tombol download aja
+        dlBtn.href = game.downloadUrl;
+        dlBtn.style.display = 'inline-block';
       }
     }
 
