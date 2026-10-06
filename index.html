@@ -19,7 +19,6 @@
     overflow-x: hidden;
   }
 
-  /* ========== LOADING ========== */
   #loadingScreen {
     display: flex;
     flex-direction: column;
@@ -50,7 +49,6 @@
   }
   @keyframes fill { to { width: 100%; } }
 
-  /* ========== MENU ========== */
   #menuScreen { display: none; animation: fadeIn 0.6s ease; }
   @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.95); }
@@ -106,7 +104,6 @@
     box-shadow: 0 0 15px rgba(0,212,255,0.5);
   }
 
-  /* ========== PLAYER ========== */
   #playerScreen {
     display: none;
     flex-direction: column;
@@ -132,18 +129,6 @@
     box-shadow: 0 0 30px rgba(0,212,255,0.4);
     background: #000;
     display: block;
-  }
-
-  /* GAME (IFRAME) */
-  #gameFrame {
-    width: 90vw;
-    height: 70vh;
-    max-width: 900px;
-    border: 2px solid #00d4ff;
-    border-radius: 12px;
-    box-shadow: 0 0 30px rgba(0,212,255,0.4);
-    background: #000;
-    display: none;
   }
 
   .overlay-text {
@@ -176,33 +161,6 @@
     to   { text-shadow: 0 0 20px #000, 0 0 40px #7b2ff7, 2px 2px 0 #000, -2px -2px 0 #000; }
   }
 
-  /* ========== TOMBOL DOWNLOAD ========== */
-  .download-btn {
-    display: none;
-    padding: 14px 32px;
-    background: linear-gradient(135deg, #00ff88, #00d4ff);
-    color: #0f0f1a;
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    box-shadow: 0 0 20px rgba(0,255,136,0.4);
-    transition: 0.3s;
-    text-decoration: none;
-    text-align: center;
-    animation: pulse 2s infinite;
-  }
-  .download-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(0,255,136,0.8);
-  }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 20px rgba(0,255,136,0.4); }
-    50%      { box-shadow: 0 0 35px rgba(0,255,136,0.8); }
-  }
-
   .back-btn {
     padding: 10px 24px;
     background: linear-gradient(135deg, #00d4ff, #7b2ff7);
@@ -215,7 +173,6 @@
   }
   .back-btn:hover { transform: scale(1.05); }
 
-  /* ========== EMOJI RAIN ========== */
   .emoji-rain {
     position: fixed;
     top: -80px;
@@ -227,27 +184,19 @@
   }
 
   @keyframes fall {
-    0% {
-      transform: translateY(0) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(110vh) rotate(360deg);
-      opacity: 0.3;
-    }
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0.3; }
   }
 </style>
 </head>
 <body>
 
-  <!-- ===== LOADING ===== -->
   <div id="loadingScreen">
     <div class="spinner"></div>
     <div class="bar"><div class="bar-fill"></div></div>
     <div class="text">LOADING...</div>
   </div>
 
-  <!-- ===== MENU ===== -->
   <div id="menuScreen">
     <div class="kotak">
       <h1>GAME</h1>
@@ -255,40 +204,26 @@
     </div>
   </div>
 
-  <!-- ===== PLAYER ===== -->
   <div id="playerScreen">
     <div class="video-wrapper">
       <video id="myVideo" controls></video>
       <div class="overlay-text" id="overlayText"></div>
     </div>
-    <iframe id="gameFrame" allowfullscreen></iframe>
-
-    <!-- ⬇️ TOMBOL DOWNLOAD GAME -->
-    <a id="downloadBtn" class="download-btn" href="#" target="_blank" rel="noopener">
-      ⬇️ Download Game
-    </a>
-
     <button class="back-btn" onclick="balikMenu()">← Kembali</button>
   </div>
 
   <script>
     /* ==========================================================
-       ISI DAFTAR GAME DI SINI BRO 👇
-       
-       - nama        : judul tombol
-       - tipe        : "video" / "game" / "download"
-                       "download" = cuma munculin tombol download
-       - url         : link video atau link game (boleh kosong kalau tipe "download")
-       - downloadUrl : (OPSIONAL) link download game
+       DAFTAR VIDEO
     ========================================================== */
     const DAFTAR_GAME = [
       { 
-        nama: "Game Superman",
+        nama: "Game 1",
         tipe: "video",
         url: "https://www.image2url.com/r2/default/files/1791149463820-3d8c6c6a-2e83-4c93-aaaa-1e3006bdeda2.mp4"
       },
       { 
-        nama: "Game Kucing",  
+        nama: "Game 2",  
         tipe: "video",
         url: "https://www.image2url.com/r2/default/files/1791148691769-8264839a-d843-44a3-9615-86a33ff51e8b.mp4",
         pesan: "ente yakin itu kucing?",
@@ -298,34 +233,41 @@
         rainInterval: 1000
       },
       { 
-        nama: "Kucing?",
-        tipe: "game",
-        url: "https://www.image2url.com/r2/default/videos/1791159675824-64a9633e-7bf3-4302-8af6-aa79514dfbe5.mp4"
-      },
-      { 
-        nama: "Game POV Cat",
+        nama: "Game 3",
         tipe: "video",
-        url: "https://www.image2url.com/r2/default/videos/1791161405454-e4839185-0a2d-4a75-943d-0e2cc28f3526.mp4",
-        downloadUrl: "https://www.mediafire.com/file/8lbqxxk15pux052/FNATBS.apk/file?dkey=r0qqhhxdlol&r=1660"
+        url: "https://www.image2url.com/r2/default/videos/1791161405454-e4839185-0a2d-4a75-943d-0e2cc28f3526.mp4"
       },
       { 
-        nama: "Game Rpg🤨",     // <-- 🆕 GAME BARU (cuma download)
-        tipe: "download",       // <-- tipe khusus: cuma tombol download
-        url: "",                // <-- ga perlu link video/game
-        downloadUrl: "https://www.mediafire.com/file/9ct6j5tjokkvf40/RPS.apk/file?dkey=19l2fuc56j8&r=400"         // <-- isi link download nanti
+        nama: "Game 4",
+        tipe: "video",
+        url: "https://www.image2url.com/r2/default/videos/1791261861698-65304ffd-42d3-43da-a9e0-f4b4ab3a9656.mp4"
       },
+      { 
+        nama: "Game 5",
+        tipe: "video",
+        url: "https://www.image2url.com/r2/default/videos/1791262075588-61656213-60f9-4eb2-8406-8a988e2c00dc.mp4"
+      },
+      { 
+        nama: "Game 6",
+        tipe: "video",
+        url: "https://www.image2url.com/r2/default/videos/1791262142532-e09eb355-bb7e-4a38-8a38-ebb35c286b68.mp4"
+      },
+      { 
+        nama: "Game 7",
+        tipe: "video",
+        url: "https://www.image2url.com/r2/default/videos/1791262216902-fb81e83b-f5db-4cbe-b94e-4e05da174c99.mp4"
+      },
+
     ];
 
     const DURASI_LOADING = 2000;
 
-    /* Loading → menu */
     setTimeout(() => {
       document.getElementById('loadingScreen').style.display = 'none';
       document.getElementById('menuScreen').style.display = 'block';
       bikinMenu();
     }, DURASI_LOADING);
 
-    /* Bikin tombol game */
     function bikinMenu() {
       const list = document.getElementById('gameList');
       list.innerHTML = '';
@@ -339,17 +281,9 @@
       });
     }
 
-    /* Klik item */
     function bukaGame(game) {
-      // Cek dulu: kalau bukan tipe "download", url wajib diisi
-      if (game.tipe !== "download" && (!game.url || game.url.trim() === "")) {
+      if (!game.url || game.url.trim() === "") {
         alert("⚠️ Link \"" + game.nama + "\" belum diisi bro!");
-        return;
-      }
-
-      // Kalau tipe "download", downloadUrl wajib diisi
-      if (game.tipe === "download" && (!game.downloadUrl || game.downloadUrl.trim() === "")) {
-        alert("⚠️ Link download \"" + game.nama + "\" belum diisi bro!");
         return;
       }
 
@@ -358,65 +292,31 @@
 
       const player  = document.getElementById('myVideo');
       const overlay = document.getElementById('overlayText');
-      const iframe  = document.getElementById('gameFrame');
-      const dlBtn   = document.getElementById('downloadBtn');
 
-      // Reset dulu semua
       player.pause();
       player.src = "";
-      player.style.display = 'none';
-      iframe.src = "";
-      iframe.style.display = 'none';
       overlay.style.display = 'none';
-      dlBtn.style.display = 'none';
 
-      /* ===== KALAU VIDEO ===== */
-      if (game.tipe === "video") {
-        player.style.display = 'block';
-        player.src = game.url;
-        player.play();
+      player.style.display = 'block';
+      player.src = game.url;
+      player.play();
 
-        if (game.pesan && game.pesan.trim() !== "") {
-          overlay.textContent = game.pesan;
-          overlay.style.display = 'block';
-        }
-
-        if (game.emojiRain && game.emojiRain.trim() !== "") {
-          const delay    = game.rainDelay    ?? 0;
-          const duration = game.rainDuration ?? 5000;
-          const interval = game.rainInterval ?? 80;
-
-          setTimeout(() => {
-            hujanEmoji(game.emojiRain, duration, interval);
-          }, delay);
-        }
-
-        if (game.downloadUrl && game.downloadUrl.trim() !== "") {
-          dlBtn.href = game.downloadUrl;
-          dlBtn.style.display = 'inline-block';
-        }
+      if (game.pesan && game.pesan.trim() !== "") {
+        overlay.textContent = game.pesan;
+        overlay.style.display = 'block';
       }
 
-      /* ===== KALAU GAME ===== */
-      else if (game.tipe === "game") {
-        iframe.style.display = 'block';
-        iframe.src = game.url;
+      if (game.emojiRain && game.emojiRain.trim() !== "") {
+        const delay    = game.rainDelay    ?? 0;
+        const duration = game.rainDuration ?? 5000;
+        const interval = game.rainInterval ?? 80;
 
-        if (game.downloadUrl && game.downloadUrl.trim() !== "") {
-          dlBtn.href = game.downloadUrl;
-          dlBtn.style.display = 'inline-block';
-        }
-      }
-
-      /* ===== KALAU CUMA DOWNLOAD ===== */
-      else if (game.tipe === "download") {
-        // Langsung tampilkan tombol download aja
-        dlBtn.href = game.downloadUrl;
-        dlBtn.style.display = 'inline-block';
+        setTimeout(() => {
+          hujanEmoji(game.emojiRain, duration, interval);
+        }, delay);
       }
     }
 
-    /* Fungsi hujan emoji */
     function hujanEmoji(emoji, duration, interval) {
       const emojiArr = [...emoji];
       const startTime = Date.now();
@@ -445,18 +345,13 @@
       }, interval);
     }
 
-    /* Balik ke menu */
     function balikMenu() {
       const player = document.getElementById('myVideo');
-      const iframe = document.getElementById('gameFrame');
 
       player.pause();
       player.src = "";
-      iframe.src = "";
-      iframe.style.display = 'none';
 
       document.getElementById('overlayText').style.display = 'none';
-      document.getElementById('downloadBtn').style.display = 'none';
       document.querySelectorAll('.emoji-rain').forEach(el => el.remove());
 
       document.getElementById('playerScreen').style.display = 'none';
